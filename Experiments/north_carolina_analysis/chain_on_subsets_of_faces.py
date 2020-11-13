@@ -105,7 +105,16 @@ def face_sierpinski_mesh(graph, special_faces):
                 # and therefore both vertex and next_vertex will be of the same
                 # district.
                 graph.nodes[label][config['ASSIGN_COL']] = graph.nodes[vertex][config['ASSIGN_COL']]
-
+    
+            # Choose a random adjacent node, assign the new node to the same partition,
+            # and move half of its votes and population to said node
+            elif config['SIERPINSKI_POP_STYLE'] == 'random':
+                chosenNode = random.choice([graph.nodes[vertex], graph.nodes[next_vertex]])
+                graph.nodes[label][config['ASSIGN_COL']] = chosenNode[config['ASSIGN_COL']]
+                for keyword in ['POP_COL', 'PARTY_A_COL', 'PARTY_B_COL']:
+                    graph.nodes[label][config[keyword]] += chosenNode[config[keyword]] // 2
+                    chosenNode[config[keyword]] -= chosenNode[config[keyword]] // 2
+    
             # Set the population and votes of the new nodes to zero. Do not change
             # previously existing nodes. Assign to random neighbor.
             elif config['SIERPINSKI_POP_STYLE'] == 'zero':
@@ -306,7 +315,7 @@ if __name__ ==  '__main__':
         "WIDTH" : 1,
         "ASSIGN_COL" : "part",
         "POP_COL" : "population",
-        'SIERPINSKI_POP_STYLE': 'uniform',
+        'SIERPINSKI_POP_STYLE': 'random',
         'GERRYCHAIN_STEPS' : 50,
         'CHAIN_STEPS' : 200,
         'TEMPERATURE' : 1,
